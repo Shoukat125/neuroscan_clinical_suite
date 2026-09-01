@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+static/uploads/*
+static/results/*
+rag_docs/*
+!static/uploads/.gitkeep
+!static/results/.gitkeep
+!rag_docs/.gitkeep

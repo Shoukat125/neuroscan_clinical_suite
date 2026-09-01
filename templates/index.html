@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeuroScan Clinical Suite · PACS Clinical Workstation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-badge">
+      <svg class="brand-mark" width="28" height="28" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <rect width="40" height="40" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1.5"/>
+        <circle cx="20" cy="20" r="13" stroke="#22D3C8" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.6"/>
+        <path d="M20 10c-3.8 0-6 2.5-6.4 5.5-2.2 0.5-3.6 2.5-3.1 4.7 0.4 1.4 1.4 2.4 2.6 2.8-0.3 0.9-0.1 1.9 0.5 2.7 0.9 1.2 2.6 1.5 3.9 0.8 0.5 1.2 1.7 2.1 3.1 1.9 1.6-0.2 2.8-1.6 2.8-3.3v-1c1.4-0.5 2.3-1.8 2.3-3.4 0-1.3-0.7-2.4-1.7-3 0.4-0.7 0.6-1.5 0.3-2.4-0.4-1.6-2-2.6-3.7-2.2-0.3-1.5-1.5-2.6-2.9-2.5z" fill="none" stroke="#22D3C8" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="17" cy="17" r="1.2" fill="#22D3C8"/>
+        <circle cx="22" cy="15.5" r="1.2" fill="#22D3C8"/>
+        <circle cx="23.5" cy="20.5" r="1.2" fill="#22D3C8"/>
+        <circle cx="18" cy="23" r="1.2" fill="#22D3C8"/>
+      </svg>
+    </div>
+    <div class="brand-info">
+      <span class="brand-name">NeuroScan <span class="accent-text">Clinical Suite</span></span>
+      <span class="brand-tag">CLINICAL RADIOLOGY WORKSTATION</span>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="scan" role="tab" aria-selected="true">
+      <span class="tab-icon">🩻</span> Scan Workstation
+    </button>
+    <button class="tab-btn" data-tab="compare" role="tab" aria-selected="false">
+      <span class="tab-icon">⚖</span> Compare Scans
+    </button>
+    <button class="tab-btn" data-tab="models" role="tab" aria-selected="false">
+      <span class="tab-icon">⚡</span> Model Registry
+    </button>
+    <button class="tab-btn" data-tab="chat" role="tab" aria-selected="false">
+      <span class="tab-icon">💬</span> Document Chat
+    </button>
+  </nav>
+  <div class="topbar-right">
+    <div class="system-status">
+      <span class="status-dot"></span>
+      <span class="status-label">SYS ONLINE · ONNX RUNTIME</span>
+    </div>
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+      <span class="icon-sun">☀</span><span class="icon-moon">☾</span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- SCAN TAB: 3-PANEL RADIOLOGY WORKSTATION -->
+  <section id="tab-scan" class="tab-panel active">
+    <div class="workstation-grid">
+      
+      <!-- LEFT PANEL: Ingestion, Metadata & Controls -->
+      <div class="workstation-panel panel-left">
+        <div class="panel-head">
+          <div class="panel-title-wrap">
+            <span class="panel-badge">01</span>
+            <h2 class="panel-title">Scan Ingestion</h2>
+          </div>
+          <span class="panel-meta-tag">INPUT</span>
+        </div>
+
+        <div class="panel-scroll-content">
+          <div class="patient-form">
+            <div class="patient-form-header">
+              <h3 class="patient-form-title">Patient Metadata</h3>
+              <span class="optional-tag">Dossier / PDF</span>
+            </div>
+            <div class="patient-form-grid">
+              <div class="form-group">
+                <label for="patientName">Patient Name</label>
+                <input type="text" id="patientName" placeholder="e.g. Eleanor Vance">
+              </div>
+              <div class="form-group">
+                <label for="patientId">MRN / Patient ID</label>
+                <input type="text" id="patientId" placeholder="e.g. MRN-90214">
+              </div>
+              <div class="form-group">
+                <label for="patientAge">Age / Gender</label>
+                <input type="text" id="patientAge" placeholder="e.g. 54Y / F">
+              </div>
+              <div class="form-group">
+                <label for="referringDoctor">Referring Doctor</label>
+                <input type="text" id="referringDoctor" placeholder="e.g. Dr. H. Sterling">
+              </div>
+            </div>
+          </div>
+
+          <div id="dropzone" class="dropzone">
+            <input type="file" id="fileInput" accept="image/*" hidden>
+            <div class="dropzone-inner">
+              <div class="dz-icon-box">
+                <span class="dz-icon">⬆</span>
+              </div>
+              <p class="dz-headline">Import Brain MRI Scan</p>
+              <p class="dz-subtext">Drag &amp; drop file or <span class="link">browse disk</span></p>
+              <p class="dz-hint">DICOM / JPG / PNG · Up to 25MB</p>
+            </div>
+          </div>
+
+          <div id="previewWrap" class="preview-wrap hidden">
+            <div class="file-ready-bar">
+              <span class="ready-dot"></span>
+              <span class="ready-text">Scan buffer loaded · Ready</span>
+            </div>
+            <button id="analyzeBtn" class="btn-primary btn-analyze">
+              <span class="btn-text">Execute AI Analysis</span>
+              <span class="btn-arrow">→</span>
+            </button>
+          </div>
+
+          <div id="pipeline" class="pipeline hidden">
+            <div class="pipeline-header">
+              <span class="pipeline-title">INFERENCE PIPELINE</span>
+              <span class="pipeline-tag">3 STAGES</span>
+            </div>
+            <div class="step" data-step="classify">
+              <span class="step-dot"></span>
+              <div class="step-details">
+                <span class="step-label">Stage 1 · Classifier</span>
+                <span class="step-sub">Tumor classification (4 classes)</span>
+              </div>
+            </div>
+            <div class="step" data-step="detect">
+              <span class="step-dot"></span>
+              <div class="step-details">
+                <span class="step-label">Stage 2 · YOLOv8s Detector</span>
+                <span class="step-sub">Spatial bounding box localization</span>
+              </div>
+            </div>
+            <div class="step" data-step="segment">
+              <span class="step-dot"></span>
+              <div class="step-details">
+                <span class="step-label">Stage 3 · YOLOv8n Segmenter</span>
+                <span class="step-sub">Polygon lesion area &amp; morphology</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENTER PANEL: Primary Scan Viewer Workstation -->
+      <div class="workstation-panel panel-center" id="viewerPanel">
+        <div class="viewer-top-hud">
+          <div class="hud-item-left">
+            <span class="hud-badge">PACS VIEWPORT</span>
+            <span class="hud-modality">MRI SCAN</span>
+          </div>
+          <div class="hud-item-center">
+            <span id="viewerStatusDot" class="status-pulse-dot"></span>
+            <span id="viewerStatusText" class="hud-status-text">AWAITING SCAN</span>
+          </div>
+        </div>
+
+        <div class="viewer-viewport" id="viewerContainer">
+          <!-- Radiology Reticles -->
+          <div class="reticle reticle-tl"></div>
+          <div class="reticle reticle-tr"></div>
+          <div class="reticle reticle-bl"></div>
+          <div class="reticle reticle-br"></div>
+          <div class="reticle-grid"></div>
+
+          <!-- Empty state when no image loaded -->
+          <div id="viewerEmpty" class="viewer-empty">
+            <div class="empty-icon-circle">
+              <span class="empty-symbol">🩻</span>
+            </div>
+            <h3 class="empty-title">DICOM / MRI Diagnostic Viewport</h3>
+            <p class="empty-desc">No active scan loaded in memory. Upload a brain MRI scan using the ingestion panel on the left to begin automated multi-stage analysis.</p>
+          </div>
+
+          <!-- Active Viewer Stage (Raw preview + overlay + cropCanvas + sweep beam) -->
+          <div id="viewerStage" class="viewer-stage hidden">
+            <div class="scan-image-wrapper">
+              <!-- Uploaded Scan Preview -->
+              <img id="previewImg" class="viewer-img preview-img" alt="Uploaded MRI scan">
+
+              <!-- Localization & Segmentation Overlay -->
+              <div id="overlayWrap" class="overlay-wrap hidden">
+                <img id="overlayImg" class="viewer-img overlay-img" alt="Tumor localization overlay">
+                <canvas id="cropCanvas" class="crop-canvas"></canvas>
+              </div>
+
+              <!-- MRI Slice Acquisition Sweep Line -->
+              <div class="scan-sweep-beam" aria-hidden="true">
+                <div class="scan-sweep-line"></div>
+                <div class="scan-sweep-gradient"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="viewer-bottom-hud">
+          <div class="hud-bottom-left">
+            <span class="hud-key">REGION VQA:</span>
+            <span id="hudRegionHint" class="hud-val">Click and drag box on scan to inspect sub-region</span>
+          </div>
+          <div class="hud-bottom-right">
+            <span class="hud-key">RENDER MODE:</span>
+            <span class="hud-val">ENHANCED RADIOLOGY</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL: Findings, Measurements & Advisories -->
+      <div class="workstation-panel panel-right">
+        <div class="panel-head">
+          <div class="panel-title-wrap">
+            <span class="panel-badge">02</span>
+            <h2 class="panel-title">Diagnostic Findings</h2>
+          </div>
+          <span class="panel-meta-tag">OUTPUT</span>
+        </div>
+
+        <div class="panel-scroll-content">
+          <!-- Standby state before analysis runs -->
+          <div id="resultsStandby" class="results-standby">
+            <span class="standby-icon">📊</span>
+            <p class="standby-title">Awaiting Inference</p>
+            <p class="standby-desc">Classification probabilities, spatial coordinates, segmentation area metrics, and clinical notes will populate here upon analysis execution.</p>
+          </div>
+
+          <div id="resultContent" class="result-content hidden">
+
+            <!-- 1. Classification Card -->
+            <div class="card classification-card">
+              <div class="card-head">
+                <div class="card-title-group">
+                  <span class="step-num-pill">1</span>
+                  <h3>Classification</h3>
+                </div>
+                <span id="clsLatency" class="latency-pill"></span>
+              </div>
+              <div id="clsVerdict" class="verdict"></div>
+              <div class="score-bars-container">
+                <div class="score-header">
+                  <span>Class Probability</span>
+                  <span>Confidence</span>
+                </div>
+                <div id="clsScores" class="score-bars"></div>
+              </div>
+            </div>
+
+            <!-- 2. Localization Card -->
+            <div id="locationCard" class="card hidden">
+              <div class="card-head">
+                <div class="card-title-group">
+                  <span class="step-num-pill">2</span>
+                  <h3>Where is it?</h3>
+                </div>
+                <span id="detLatency" class="latency-pill"></span>
+              </div>
+              <div id="detList" class="detect-list"></div>
+              <p class="crop-hint">
+                <span class="hint-bullet">●</span> Draw a box on the center scan viewer to ask questions about a targeted tissue region.
+              </p>
+            </div>
+
+            <!-- 3. Size / Morphology Card -->
+            <div id="sizeCard" class="card hidden">
+              <div class="card-head">
+                <div class="card-title-group">
+                  <span class="step-num-pill">3</span>
+                  <h3>How large is it?</h3>
+                </div>
+                <span id="segLatency" class="latency-pill"></span>
+              </div>
+              <div id="segList" class="segment-list"></div>
+            </div>
+
+            <!-- 4. Region Q&A Card -->
+            <div id="regionQaCard" class="card hidden">
+              <div class="card-head">
+                <div class="card-title-group">
+                  <span class="step-num-pill">4</span>
+                  <h3>Ask about a region</h3>
+                </div>
+                <span class="preview-badge">Preview</span>
+              </div>
+              <p class="card-sub-hint">Inquire about margins, necrosis, edema, or tissue density in your selected crop.</p>
+              <form id="regionQaForm" class="region-qa-form">
+                <input type="text" id="regionQaInput" placeholder="e.g. Is this tissue edge irregular?" autocomplete="off">
+                <button type="submit" class="btn-primary btn-qa">Ask</button>
+              </form>
+              <div id="regionQaAnswer" class="region-qa-answer hidden"></div>
+            </div>
+
+            <!-- 5. Treatment Advisory Card -->
+            <div id="advisoryCard" class="card hidden">
+              <div class="card-head">
+                <div class="card-title-group">
+                  <span class="step-num-pill">5</span>
+                  <h3>Treatment Advisory</h3>
+                </div>
+                <span class="preview-badge">AI-assisted</span>
+              </div>
+              <p class="advisory-hint">Combines scan metrics with institutional guidelines (Document Chat tab) to compile a structured consultation summary. The physician retains final determination.</p>
+              <button id="generateAdvisoryBtn" class="btn-primary btn-full">Generate Treatment Advisory</button>
+              <div id="advisoryResult" class="advisory-result hidden"></div>
+            </div>
+
+            <!-- 6. PDF Report Card -->
+            <div class="card report-card">
+              <button id="downloadReportBtn" class="btn-primary btn-full btn-download">
+                <span>⬇ Download PDF Report</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- COMPARE TAB -->
+  <section id="tab-compare" class="tab-panel">
+    <div class="standard-page-container">
+      <div class="section-title-wrap">
+        <span class="section-tag">LONGITUDINAL TRACKING</span>
+        <h1 class="page-title">Track tumor growth over time</h1>
+        <p class="page-sub">Upload an older baseline scan and a recent follow-up scan for the same patient to quantify morphological area delta and volumetric trend.</p>
+      </div>
+
+      <div class="compare-grid">
+        <div class="compare-col card">
+          <div class="compare-header">
+            <span class="compare-num">SCAN A</span>
+            <h3 class="compare-label">Older / Baseline Scan</h3>
+          </div>
+          <div id="oldDropzone" class="dropzone small">
+            <input type="file" id="oldFileInput" accept="image/*" hidden>
+            <div class="dropzone-inner">
+              <span class="dz-icon">⬆</span>
+              <p>Drag &amp; drop baseline scan, or <span class="link">browse</span></p>
+            </div>
+          </div>
+          <img id="oldPreview" class="compare-preview hidden" alt="Older scan preview">
+        </div>
+
+        <div class="compare-col card">
+          <div class="compare-header">
+            <span class="compare-num">SCAN B</span>
+            <h3 class="compare-label">Newer / Follow-up Scan</h3>
+          </div>
+          <div id="newDropzone" class="dropzone small">
+            <input type="file" id="newFileInput" accept="image/*" hidden>
+            <div class="dropzone-inner">
+              <span class="dz-icon">⬆</span>
+              <p>Drag &amp; drop follow-up scan, or <span class="link">browse</span></p>
+            </div>
+          </div>
+          <img id="newPreview" class="compare-preview hidden" alt="Newer scan preview">
+        </div>
+      </div>
+
+      <div class="compare-action-row">
+        <button id="compareBtn" class="btn-primary btn-compare" disabled>Compare scans</button>
+      </div>
+
+      <div id="compareResult" class="compare-result hidden">
+        <div class="compare-images">
+          <div class="compare-img-box card">
+            <div class="compare-box-tag">BASELINE</div>
+            <img id="oldResultImg" alt="Older scan result">
+            <p class="compare-caption" id="oldAreaLabel"></p>
+          </div>
+          <div class="compare-img-box card">
+            <div class="compare-box-tag">FOLLOW-UP</div>
+            <img id="newResultImg" alt="Newer scan result">
+            <p class="compare-caption" id="newAreaLabel"></p>
+          </div>
+        </div>
+        <div id="compareVerdict" class="compare-verdict"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODELS TAB -->
+  <section id="tab-models" class="tab-panel">
+    <div class="standard-page-container">
+      <div class="section-title-wrap">
+        <span class="section-tag">ARCHITECTURE &amp; REGISTRY</span>
+        <h1 class="page-title">Model registry</h1>
+        <p class="page-sub">Every fine-tuned neural network active in the NeuroScan Clinical Suite pipeline, its hardware footprint, input/output tensors, and execution runtime.</p>
+      </div>
+      <div id="modelGrid" class="model-grid"></div>
+    </div>
+  </section>
+
+  <!-- CHAT TAB -->
+  <section id="tab-chat" class="tab-panel">
+    <div class="chat-layout">
+      <div class="chat-sidebar card">
+        <div class="sidebar-header">
+          <span class="section-tag">PROTOCOL REPOSITORY</span>
+          <h2 class="side-title">Reference Documents</h2>
+          <p class="side-sub">Upload clinical oncology guidelines or hospital protocol PDFs. Query answers will cite page citations via lexical indexing.</p>
+        </div>
+        <div id="pdfDropzone" class="dropzone small">
+          <input type="file" id="pdfInput" accept="application/pdf" multiple hidden>
+          <div class="dropzone-inner">
+            <span class="dz-icon">📄</span>
+            <p>Drop PDF guidelines, or <span class="link">browse</span></p>
+            <p class="dz-hint">Multiple PDF files supported</p>
+          </div>
+        </div>
+        <div class="doc-list-wrap">
+          <span class="doc-list-title">INDEXED DOSSIERS</span>
+          <div id="docList" class="doc-list"></div>
+        </div>
+      </div>
+      <div class="chat-main card">
+        <div class="chat-top-bar">
+          <div class="chat-title-group">
+            <span class="chat-assistant-dot"></span>
+            <span class="chat-assistant-name">Clinical Guidelines Assistant</span>
+          </div>
+          <span class="chat-tag">RAG / ZERO-VECTOR LEXICAL</span>
+        </div>
+        <div id="chatLog" class="chat-log">
+          <div class="chat-msg bot">
+            <p>Upload a hospital guideline or neuro-oncology protocol PDF on the left, then ask questions about grading standards, surgical planning, or chemotherapy regimens. Direct page citations will be supplied.</p>
+          </div>
+        </div>
+        <form id="chatForm" class="chat-form">
+          <input type="text" id="chatInput" placeholder="Ask a question about your documents…" autocomplete="off">
+          <button type="submit" class="btn-primary">Ask</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
+
