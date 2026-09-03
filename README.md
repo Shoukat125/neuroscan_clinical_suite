@@ -1,7 +1,7 @@
 # NeuroScan Clinical Suite — Brain Tumor Analysis Web App
 
-Flask app jo teen fine-tuned models ko chain karta hai (classification → detection → segmentation),
-aur saath mein ek vectorless PDF RAG chatbot (Groq Llama 3.1 8B) bhi shamil hai.
+A Flask app that chains three fine-tuned models (classification → detection → segmentation),
+along with a vectorless PDF RAG chatbot powered by Groq.
 
 ## Folder Structure
 
@@ -9,7 +9,7 @@ aur saath mein ek vectorless PDF RAG chatbot (Groq Llama 3.1 8B) bhi shamil hai.
 braincare/
 ├── app.py                  # Flask routes
 ├── requirements.txt
-├── models/                 # aapke 3 .onnx files yahan hain
+├── models/                 # your 3 .onnx files go here
 ├── utils/
 │   ├── inference.py         # classification + detection + segmentation logic
 │   ├── rag.py                # BM25 vectorless retrieval (page-level chunks)
@@ -22,61 +22,79 @@ braincare/
 └── rag_docs/                 # uploaded PDFs
 ```
 
-## Setup (local machine par)
+## Setup (on your local machine)
 
-1. Python 3.10+ install hona chahiye.
+1. Python 3.10+ must be installed.
 
-2. Virtual environment banayein (recommended):
+2. Create a virtual environment (recommended):
    ```bash
    python3 -m venv venv
    source venv/bin/activate      # Windows: venv\Scripts\activate
    ```
 
-3. Dependencies install karein:
+3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-4. Apni Groq API key `.env` file mein set karein:
-   - `.env` file project ke root mein already maujood hai, bas usme apni key daal dein:
+4. Set your Groq API key in the `.env` file:
+   - Create a `.env` file in the project root (it is **not** included in the repo for
+     security reasons — never commit real API keys):
      ```
      GROQ_API_KEY=your_groq_api_key_here
      ```
-   - App start hote hi yeh key automatically load ho jayegi (`.env` git mein commit nahi hoti — `.gitignore` mein hai).
+   - The key loads automatically as soon as the app starts (`.env` is excluded via
+     `.gitignore`).
 
-5. App run karein:
+5. Run the app:
    ```bash
    python app.py
    ```
 
-6. Browser mein open karein: **http://localhost:5000**
+6. Open in your browser: **http://localhost:5000**
 
-## Kya hai isme
+## What's Inside
 
 ### 1. Scan tab
-- MRI image upload karein (drag & drop ya browse)
-- "Analyze scan" dabayein
-- **Stage 1 — Classification**: `brain_tumor_classifier.onnx` batata hai tumor hai ya nahi, aur type (glioma/meningioma/pituitary/notumor)
-- Agar tumor positive aaye:
-  - **Stage 2 — Detection**: `brain_tumor_yolov8s_best.onnx` bounding box ke saath dikhata hai tumor kahan hai
-  - **Stage 3 — Segmentation**: `brain_tumor_seg_yolov8n_best.onnx` exact mask + area (pixels aur % of image) dikhata hai
-- Overlay image (mask + box highlighted) screen par dikhti hai
+- Upload an MRI image (drag & drop or browse)
+- Click "Analyze scan"
+- **Stage 1 — Classification**: `brain_tumor_classifier.onnx` determines whether there is a tumor
+  or not, and its type (glioma/meningioma/pituitary/notumor)
+- If the result is tumor-positive:
+  - **Stage 2 — Detection**: `brain_tumor_yolov8s_best.onnx` shows the tumor location with a
+    bounding box
+  - **Stage 3 — Segmentation**: `brain_tumor_seg_yolov8n_best.onnx` shows the exact mask + area
+    (in pixels and % of image)
+- The overlay image (mask + box highlighted) is displayed on screen
 
 ### 2. Models tab
-- Teeno models ki detail: file path, size (MB), input/output shape
+- Details of all three models: file path, size (MB), input/output shape
 
 ### 3. Document Chat tab
-- PDF upload karein
-- Sawal poochein — answer **page number reference** ke saath aayega
-- Retrieval **BM25 (lexical/keyword)** se hota hai, koi vector database nahi (FAISS/Chroma free hai is approach mein)
-- LLM: **Groq Llama 3.1 8B Instant**
+- Upload a PDF
+- Ask questions — the answer comes back with a **page number reference**
+- Retrieval is done via **BM25 (lexical/keyword)** — no vector database (this approach is
+  free of FAISS/Chroma)
+- LLM: **Groq `openai/gpt-oss-20b`** for text chat, **Groq `qwen/qwen3.6-27b`** for
+  vision-based tasks (region VQA, image-based advisory)
 
 ## Notes / Limitations
 
-- Classifier label order assume kiya gaya hai alphabetically: `glioma, meningioma, notumor, pituitary`
-  (Keras `flow_from_directory` ka default behaviour). Agar aapke training mein order alag tha,
-  to `utils/inference.py` mein `CLASSIFIER_LABELS` list update kar dein.
-- Detection/Segmentation models sirf tab chalte hain jab classifier "tumor" predict kare (notumor nahi).
-- BM25 chhote PDF corpus par bhi kaam karta hai, lekin jitni zyada PDFs/pages honge utna behtar retrieval hoga.
-- Yeh local/dev server hai (`debug=True`). Production deploy ke liye gunicorn/waitress use karein
-  aur `debug=False` rakhein.
+- The classifier label order is assumed to be alphabetical: `glioma, meningioma, notumor, pituitary`
+  (Keras `flow_from_directory`'s default behavior). If your training used a different order,
+  update the `CLASSIFIER_LABELS` list in `utils/inference.py`.
+- Detection/Segmentation models only run when the classifier predicts "tumor" (not notumor).
+- BM25 works even on a small PDF corpus, but retrieval quality improves with more PDFs/pages.
+- The app runs with `debug=False` and binds to `0.0.0.0`, ready for a production WSGI
+  server (gunicorn/waitress) behind a reverse proxy — do not use Flask's built-in dev
+  server directly in production.
+
+## Deployment Notes (Alibaba Cloud)
+
+- Never commit `.env` or any real API key to the repository. Set `GROQ_API_KEY` as an
+  environment variable / secret on the cloud instance instead.
+- Run behind gunicorn (e.g. `gunicorn -w 2 -b 0.0.0.0:5000 app:app`) rather than
+  `python app.py` directly.
+- If a Groq key was ever pushed to a public GitHub repo, treat it as compromised —
+  revoke and regenerate it in the Groq console, regardless of later removing it from
+  the code.
