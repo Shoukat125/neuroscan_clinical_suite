@@ -74,7 +74,7 @@ def api_treatment_advisory():
 
     try:
         note = llm.treatment_advisory(image_for_llm, measurements_text, guideline_chunks, patient_context)
-        powered_by = "qwen3.6-27b"
+        powered_by = "qwen3.8-27b"
     except Exception as e:
         return jsonify({"error": f"Treatment advisory generation failed: {e}"}), 502
 

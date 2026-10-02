@@ -116,7 +116,7 @@ def api_region_vqa():
             known_classification=known_classification,
             actual_tumor_size=actual_size_summary,
         )
-        powered_by = "qwen3.6-27b"
+        powered_by = "qwen3.8-27b"
     except Exception as e:
         # Keep the feature usable (e.g. missing/invalid API key, network
         # issue, rate limit) by falling back to the stats-only summary

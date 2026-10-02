@@ -22,11 +22,11 @@ MODEL = "openai/gpt-oss-20b"
 
 # Vision-capable model — powers Region Crop VQA and Treatment Advisory, both
 # of which need to reason over the MRI image itself, not just numbers.
-# "Qwen 3.2" does not exist on Groq; qwen/qwen3.6-27b is the current publicly
+# "Qwen 3.2" does not exist on Groq; qwen/qwen3.8-27b is the current publicly
 # available multimodal model (image + text) on a standard Groq API key.
-VISION_MODEL = "qwen/qwen3.6-27b"
+VISION_MODEL = "qwen/qwen3.8-27b"
 
-# Qwen 3.6 is a hybrid "thinking / non-thinking" model. Left on its default,
+# Qwen 3.8 is a hybrid "thinking / non-thinking" model. Left on its default,
 # it writes out its full internal planning ("The user wants me to...",
 # "Drafting the response...") as part of the visible answer, which can also
 # burn the whole token budget before it ever writes the real answer —
@@ -91,7 +91,7 @@ def vision_answer(image_path, question, supporting_stats=None, known_classificat
     """Upgrade 4 — Interactive Region Crop VQA.
 
     Sends the cropped MRI region + the doctor's free-text question to
-    Qwen 3.6-27B (Groq) for a true visual answer, grounded with locally
+    Qwen 3.8-27B (Groq) for a true visual answer, grounded with locally
     computed pixel/segmentation stats so the model isn't reasoning on the
     image alone.
     """
@@ -150,7 +150,7 @@ def treatment_advisory(image_path, measurements_text, guideline_chunks, patient_
 
     Combines the scan/overlay image, the ONNX-derived measurements, and
     retrieved hospital-protocol PDF excerpts (via RAG) into one prompt for
-    Qwen 3.6-27B, producing a structured note for the doctor. The doctor
+    Qwen 3.8-27B, producing a structured note for the doctor. The doctor
     remains the final decision maker — the model is instructed accordingly
     and the output always carries that disclaimer.
     """
